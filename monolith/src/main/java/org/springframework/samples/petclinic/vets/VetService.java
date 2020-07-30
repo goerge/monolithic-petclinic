@@ -1,6 +1,8 @@
 package org.springframework.samples.petclinic.vets;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -11,13 +13,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class VetService {
 
-	private final VetRepository vets;
+	private final VetRepository vetsRepository;
 
-	VetService(VetRepository vets) {
-		this.vets = vets;
+	VetService(VetRepository vetsRepository) {
+		this.vetsRepository = vetsRepository;
 	}
 
-	public Collection<Vet> allVets() {
-		return this.vets.findAll();
+	public Collection<VetDto> allVets() {
+		List<VetDto> vets = vetsRepository.findAll().stream().map(v -> new VetDto(v.getId(), v.getFirstName(), v.getLastName(),
+				v.getSpecialties().stream().map(Specialty::getName).collect(Collectors.toSet()))).collect(Collectors.toList());
+
+		return vets;
 	}
 }
