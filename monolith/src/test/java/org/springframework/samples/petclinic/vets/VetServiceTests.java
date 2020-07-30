@@ -13,38 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.samples.petclinic.model;
+package org.springframework.samples.petclinic.vets;
+
+import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.samples.petclinic.db.RevenueRepository;
-import org.springframework.samples.petclinic.db.VisitRepository;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * @author Ken Krebs
+ * @author Rod Johnson
+ * @author Juergen Hoeller
+ * @author Sam Brannen
+ * @author Michael Isvy
+ * @author Dave Syer
+ */
 @SpringBootTest
-class RepositoryIntegrationTests {
+class VetServiceTests {
 
     @Autowired
-    VisitRepository visitsRepository;
-
-    @Autowired
-    RevenueRepository revenueRepository;
+	VetService service;
 
     @Test
-    void testFindVisits() {
-        List<Visit> visits = this.visitsRepository.findByPetId(7);
-        assertThat(visits).hasSize(2);
-        assertThat(visits.get(0).getCost()).isEqualTo(100);
-    }
+    void shouldFindVets() {
+        Collection<Vet> vets = service.allVets();
 
-    @Test
-    void testGenerateRevenueReport() {
-        List<YearlyRevenue> yearlyRevenues = this.revenueRepository.listYearlyRevenue();
-        assertThat(yearlyRevenues).hasSize(1);
-        assertThat(yearlyRevenues.get(0).getTotal()).isEqualTo(800L);
+        assertThat(vets)
+            .filteredOn(vet -> vet.getId() == 3)
+            .hasSize(1)
+            .first()
+            .hasFieldOrPropertyWithValue("lastName", "Douglas")
+            .hasFieldOrPropertyWithValue("nrOfSpecialties", 2)
+            .extracting(Vet::getSpecialties).asList()
+            .extracting("name")
+            .containsExactly("dentistry", "surgery");
     }
 }
