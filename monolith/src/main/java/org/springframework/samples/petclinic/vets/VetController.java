@@ -29,9 +29,9 @@ import java.util.Map;
 @Controller
 class VetController {
 
-    private final VetService service;
+    private final IVetService service;
 
-    public VetController(VetService vetService) {
+    public VetController(IVetService vetService) {
         this.service = vetService;
     }
 
